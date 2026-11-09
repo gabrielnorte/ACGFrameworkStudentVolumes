@@ -24,16 +24,20 @@ void Application::init(GLFWwindow* window)
     this->background_color = glm::vec3(0.1f, 0.1f, 0.1f); //We later send this to the shader
 
 
+    //Initialize materials
+    absorption_mat = new AbsorptionModelMaterial();
+    flat_mat = new FlatMaterial();
+
     /* ADD NODES TO THE SCENE */
     SceneNode* example = new SceneNode("Example Node");
     example->mesh = Mesh::Get("res/meshes/sphere.obj");
-    example->material = new FlatMaterial();
+    example->material = flat_mat;
     this->node_list.push_back(example);
 
     // Adding sphere for volue (TASK 1)
     SceneNode* volume_1 = new SceneNode("Volume Node");
     volume_1->mesh = Mesh::Get("res/meshes/cube.obj");
-    volume_1->material = new EmissionAbsorbtion();
+    volume_1->material = absorption_mat;
     this->node_list.push_back(volume_1);
 }
 

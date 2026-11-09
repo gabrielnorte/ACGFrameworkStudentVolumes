@@ -16,6 +16,8 @@ public:
 	Texture* texture = NULL;
 	glm::vec4 color;
 
+	int index; //Used for selections
+
 	virtual void setUniforms(Camera* camera, glm::mat4 model) = 0;
 	virtual void render(Mesh* mesh, glm::mat4 model, Camera* camera) = 0;
 	virtual void renderInMenu() = 0;

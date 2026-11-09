@@ -207,7 +207,16 @@ void AbsorptionModelMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera
 
 void AbsorptionModelMaterial::renderInMenu()
 {
-	int index = 0;
-	ImGui::Combo("Light  Model", &index ,"Absorption\0AbsorptionEmission");
+	//ImGui::Combo("Light  Model", &index ,"Absorption\0AbsorptionEmission\0");
 	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
+	if (ImGui::Combo("Light  Model", &index, "Absorption\0Flat\0") == true) { //Show Combo and check if changed	
+		switch (index) {
+		case 0:
+			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
+			break;
+		case 1:
+			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/flat.fs");
+			break;
+		}
+	}
 }

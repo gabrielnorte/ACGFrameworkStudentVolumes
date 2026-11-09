@@ -18,10 +18,12 @@ public:
 	glm::vec4 color;
 
 	int index; //Used for selections
+	bool abs_slider = false;
+	bool step_slider = false;
 
 	virtual void setUniforms(Camera* camera, glm::mat4 model) = 0;
 	virtual void render(Mesh* mesh, glm::mat4 model, Camera* camera) = 0;
-	virtual void renderInMenu() = 0;
+	virtual void renderInMenu() = 0; //=0, thus should be overriden by child classes
 };
 
 class FlatMaterial : public Material {
@@ -65,6 +67,7 @@ public:
 	float abs_coefficient;
 	Shader* base_shader = NULL;
 	
+	
 	AbsorptionModelMaterial(float abs_coefficient = 0.5);
 	~AbsorptionModelMaterial();
 	void setUniforms(Camera* camera, glm::mat4 model);
@@ -79,7 +82,8 @@ public:
 	Shader* base_shader = NULL;
 	float step;
 
-	AbsorptionHeterogeneous(float abs_coefficient = 1, float step = 0.1);
+
+	AbsorptionHeterogeneous(float abs_coefficient = 1, float step = 0.01);
 	~AbsorptionHeterogeneous();
 	void setUniforms(Camera* camera, glm::mat4 model);
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);
@@ -95,7 +99,7 @@ public:
 	glm::vec3 Le;
 	
 
-	EmissionAbsorbtion(float abs_coefficient = 1, float step = 0.1, float Le = 1.0);
+	EmissionAbsorbtion(float abs_coefficient = 1, float step = 0.01, float Le = 1.0);
 	~EmissionAbsorbtion();
 	void setUniforms(Camera* camera, glm::mat4 model);
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);

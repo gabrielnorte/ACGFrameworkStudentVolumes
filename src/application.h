@@ -18,8 +18,10 @@ public:
 	glm::vec3 background_color;
 	std::vector<Light*> light_list;
 
+	FlatMaterial* flat_mat;
 	AbsorptionModelMaterial *absorption_mat;
-	FlatMaterial *flat_mat;
+	AbsorptionHeterogeneous* absorb_het_mat;
+	EmissionAbsorbtion* emis_absorb_mat;
 
 	int current_task = 0;
 

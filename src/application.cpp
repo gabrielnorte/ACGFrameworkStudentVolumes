@@ -27,6 +27,8 @@ void Application::init(GLFWwindow* window)
     //Initialize materials
     absorption_mat = new AbsorptionModelMaterial();
     flat_mat = new FlatMaterial();
+    emis_absorb_mat = new EmissionAbsorbtion();
+    absorb_het_mat = new AbsorptionHeterogeneous();
 
     /* ADD NODES TO THE SCENE */
     SceneNode* example = new SceneNode("Example Node");
@@ -37,7 +39,7 @@ void Application::init(GLFWwindow* window)
     // Adding sphere for volue (TASK 1)
     SceneNode* volume_1 = new SceneNode("Volume Node");
     volume_1->mesh = Mesh::Get("res/meshes/cube.obj");
-    volume_1->material = absorption_mat;
+    volume_1->material = absorb_het_mat;
     this->node_list.push_back(volume_1);
 }
 

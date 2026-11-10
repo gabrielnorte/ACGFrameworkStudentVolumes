@@ -125,7 +125,6 @@ vec3 getLight(vec3 pos) {
 }
 
 
-
 void main()
 {
 	
@@ -144,7 +143,6 @@ void main()
 	vec3 pos = rayDir * i + rayOrigin;
 	float tau = 0.0;
     vec3 emission = vec3(0.0);
-    float T = 0.0;
 
 	if(exit_dist <= entry_dist){
 		FragColor = vec4(B, 1.0);
@@ -156,11 +154,11 @@ void main()
 		tau += mu_a * delta;
 		i += delta;
         vec3 Le = getLight(pos);
-        T = exp(-tau);
+        float T = exp(-tau);
         emission += T*Le*mu_a;
 		pos = rayOrigin + rayDir * i;
 	}
-
+	float T = exp(-tau);
 
 	vec3 L = B*T+emission;
 

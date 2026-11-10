@@ -99,7 +99,7 @@ public:
 	glm::vec3 Le;
 	
 
-	EmissionAbsorbtion(float abs_coefficient = 1, float step = 0.01, float Le = 1.0);
+	EmissionAbsorbtion(float abs_coefficient = 1, float step = 0.01);
 	~EmissionAbsorbtion();
 	void setUniforms(Camera* camera, glm::mat4 model);
 	void render(Mesh* mesh, glm::mat4 model, Camera* camera);

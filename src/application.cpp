@@ -27,7 +27,7 @@ void Application::init(GLFWwindow* window)
     //Initialize materials
     absorption_mat = new AbsorptionModelMaterial();
     flat_mat = new FlatMaterial();
-    emis_absorb_mat = new EmissionAbsorbtion();
+    emis_absorb_mat = new EmissionAbsorbtion(0.5, 0.1);
     absorb_het_mat = new AbsorptionHeterogeneous();
 
     /* ADD NODES TO THE SCENE */
@@ -39,7 +39,23 @@ void Application::init(GLFWwindow* window)
     // Adding sphere for volue (TASK 1)
     SceneNode* volume_1 = new SceneNode("Volume Node");
     volume_1->mesh = Mesh::Get("res/meshes/cube.obj");
-    volume_1->material = absorb_het_mat;
+    volume_1->material = absorption_mat;
+    // Show GUI based on material
+    if (volume_1->material == absorption_mat) {
+        volume_1->material->abs_slider = true;
+        volume_1->material->index = 0;
+    }
+    else if (volume_1->material == emis_absorb_mat) {
+        volume_1->material->abs_slider = true;
+        volume_1->material->step_slider = true;
+        volume_1->material->index = 1;
+    }
+    else if (volume_1->material == absorb_het_mat) {
+        volume_1->material->abs_slider = true;
+        volume_1->material->step_slider = true;
+        volume_1->material->index = 2;
+    }
+
     this->node_list.push_back(volume_1);
 }
 
@@ -51,6 +67,8 @@ void Application::update(float dt)
         this->camera->orbit(-delta.x * dt, delta.y * dt);
     }
     this->lastMousePosition = this->mousePosition;
+
+    //Check current shader and change material
 }
 
 void Application::render()
@@ -93,10 +111,30 @@ void Application::renderGUI()
         for (auto& node : this->node_list) {
             ss << count;
             if (ImGui::TreeNode(node->name.c_str())) {
-                node->renderInMenu();
+                if (node == this->node_list[1]) {
+                    if (ImGui::Combo("Light Model", &material_index, "Absorption Homogeneous\0Absorption Heterogeneous\0Absorption-Emission\0"))
+                    {
+                        switch (material_index)
+                        {
+                        case 0:
+                            node_list[1]->material = absorption_mat;
+                            break;
+
+                        case 1:
+                            node_list[1]->material = absorb_het_mat;
+                            break;
+
+                        case 2:
+                            node_list[1]->material = emis_absorb_mat;
+                            break;
+                        }
+                    }
+                }
+                node->material->renderInMenu();
                 ImGui::TreePop();
             }
         }
+
         ImGui::TreePop();
     }
 }

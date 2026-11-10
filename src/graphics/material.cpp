@@ -208,32 +208,8 @@ void AbsorptionHeterogeneous::render(Mesh* mesh, glm::mat4 model, Camera* camera
 
 void AbsorptionHeterogeneous::renderInMenu()
 {
-	if (ImGui::Combo("Light  Model", &index, "Absorption Homogeneous\0Absorption Heterogeneous\0Absorption-Emission") == true) { //Show Combo and check if changed	
-		switch (index) {
-		case 0:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
-			abs_slider = true;
-			step_slider = false;
-			break;
-		case 1:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionheterogeneous.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		case 2:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emission_absorbtion.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		}
-	}
-
-	if (abs_slider == true) {
 		ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
-	}
-	if (step_slider == true) {
 		ImGui::SliderFloat("Step size", &this->step, 0, 1);
-	}
 }
 
 // ABSORPTION MODEL
@@ -278,43 +254,16 @@ void AbsorptionModelMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera
 
 void AbsorptionModelMaterial::renderInMenu()
 {
-	//ImGui::Combo("Light  Model", &index ,"Absorption\0AbsorptionEmission\0");
-	//ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
-	if (ImGui::Combo("Light  Model", &index, "Absorption Homogeneous\0Absorption Heterogeneous\0Absorption-Emission") == true) { //Show Combo and check if changed	
-		switch (index) {
-		case 0:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
-			abs_slider = true;
-			step_slider = false;
-			break;
-		case 1:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionheterogeneous.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		case 2:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emission_absorbtion.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		}
-	}
-
-	if (abs_slider == true) {
-		ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
-	}
-	//if (step_slider == true) {
-	//	ImGui::SliderFloat("Step size", step);
-	//}
+	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
 }
 
 
 // EMISSION ABSORBTION
 
-EmissionAbsorbtion::EmissionAbsorbtion(float abs_coefficient_, float step_, float Le_) {
+EmissionAbsorbtion::EmissionAbsorbtion(float abs_coefficient_, float step_) {
 	this->abs_coefficient = abs_coefficient_;
 	this->step = step_;
-	this->Le = glm::vec3(Le_);
+	//this->Le = Application::instance->ambient_light;
 
 	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emission_absorbtion.fs");
 	this->shader = this->base_shader;
@@ -333,7 +282,8 @@ void EmissionAbsorbtion::setUniforms(Camera* camera, glm::mat4 model) {
 	this->shader->setUniform("u_abs_coefficient", this->abs_coefficient);
 	this->shader->setUniform("u_camera_origin", Application::instance->camera->eye);
 	this->shader->setUniform("u_step", this->step);
-	this->shader->setUniform3("u_emitted_light", this->Le);
+	//std::cout << Application::instance->ambient_light.x << Application::instance->ambient_light.y << Application::instance->ambient_light.z;
+	this->shader->setUniform3("u_emitted_light", Le);
 
 }
 
@@ -355,30 +305,7 @@ void EmissionAbsorbtion::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 
 void EmissionAbsorbtion::renderInMenu()
 {
-	if (ImGui::Combo("Light  Model", &index, "Absorption Homogeneous\0Absorption Heterogeneous\0Absorption-Emission") == true) { //Show Combo and check if changed	
-		switch (index) {
-		case 0:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
-			abs_slider = true;
-			step_slider = false;
-			break;
-		case 1:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionheterogeneous.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		case 2:
-			this->shader = Shader::Get("res/shaders/basic.vs", "res/shaders/emission_absorbtion.fs");
-			abs_slider = true;
-			step_slider = true;
-			break;
-		}
-	}
-
-	if (abs_slider == true) {
-		ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
-	}
-	if (step_slider == true) {
-		ImGui::SliderFloat("Step size", &this->step, 0, 1);
-	}
+	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
+	ImGui::SliderFloat("Step size", &this->step, 0, 1);
+	ImGui::ColorEdit3("Emission color", (float*)&this->Le);
 }

@@ -96,7 +96,7 @@ public:
 	float abs_coefficient;
 	Shader* base_shader = NULL;
 	float step;
-	glm::vec3 Le;
+	glm::vec3 Le = glm::vec3(0.0);
 	
 
 	EmissionAbsorbtion(float abs_coefficient = 1, float step = 0.01);

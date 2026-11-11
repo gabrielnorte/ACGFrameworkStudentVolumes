@@ -208,7 +208,7 @@ void AbsorptionHeterogeneous::render(Mesh* mesh, glm::mat4 model, Camera* camera
 
 void AbsorptionHeterogeneous::renderInMenu()
 {
-		ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
+		ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 4);
 		ImGui::SliderFloat("Step size", &this->step, 0, 1);
 }
 
@@ -254,7 +254,7 @@ void AbsorptionModelMaterial::render(Mesh* mesh, glm::mat4 model, Camera* camera
 
 void AbsorptionModelMaterial::renderInMenu()
 {
-	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
+	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 4);
 }
 
 
@@ -305,7 +305,7 @@ void EmissionAbsorbtion::render(Mesh* mesh, glm::mat4 model, Camera* camera)
 
 void EmissionAbsorbtion::renderInMenu()
 {
-	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 1);
+	ImGui::SliderFloat("Absorption coefficient", &this->abs_coefficient, 0, 4);
 	ImGui::SliderFloat("Step size", &this->step, 0, 1);
 	ImGui::ColorEdit3("Emission color", (float*)&this->Le);
 }

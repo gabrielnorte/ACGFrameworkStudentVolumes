@@ -16,6 +16,7 @@ uniform vec4 u_light_color;
 uniform vec3 u_local_light_position;
 uniform float u_scat_coefficient;
 uniform sampler3D u_3D_volume;
+uniform bool u_vdb_noise;
 
 out vec4 FragColor; 
 
@@ -123,10 +124,15 @@ float noise3Ddata(vec3 pos) {
 // RAY MARCHING FUNCTIONS
 
 float getAbsorbtion(vec3 pos) {
+	if (u_vdb_noise == true) {
 	//POSITION SHOULD BE IN TEXTURE POSITION
 	pos = clamp(pos, vec3(0.0), vec3(1.0));
-
 	return clamp(noise3Ddata(pos), 0.0, 1.0);
+	}
+	
+	else {
+		return clamp(snoiseFractal(pos), 0.0, 1.0);
+	}
 }
 
 float computeStep(float inter) {
@@ -152,7 +158,7 @@ void main()
 	float entry_dist = max(entry_exit[0], 0.0);
 	float exit_dist = entry_exit[1];
 
-	float delta = max(computeStep(exit_dist-entry_dist), 0.1);
+	float delta = max(computeStep(exit_dist-entry_dist), 0.01);
 	float i = delta * 0.5 + entry_dist;
 	vec3 pos = rayDir * i + rayOrigin;
 	float tau = 0.0;

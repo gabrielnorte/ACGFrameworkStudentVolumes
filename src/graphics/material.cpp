@@ -173,6 +173,8 @@ void StandardMaterial::renderInMenu()
 VolumeMaterial::VolumeMaterial(float abs_coefficient_, float step_) {
 	this->abs_coefficient = abs_coefficient_;
 	this->step = step_;
+	this->step_scattering = step_;
+	this->vdb_noise = true;
 	//this->Le = Application::instance->ambient_light;
 	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
 	this->shader = this->base_shader;
@@ -201,10 +203,14 @@ void VolumeMaterial::setUniforms(Camera* camera, glm::mat4 model) {
 	this->shader->setUniform("u_mesh_aabbmin", Application::instance->node_list[0]->mesh->aabb_min);
 	this->shader->setUniform("u_mesh_aabbmax", Application::instance->node_list[0]->mesh->aabb_max);
 	this->shader->setUniform3("u_emitted_light", Le);
+	this->shader->setUniform("u_light_change", emission_change);
 	this->shader->setUniform("u_scat_coefficient", this->scat_coefficient);
+	this->shader->setUniform("u_g", this->g_coefficient);
+	this->shader->setUniform("u_step_scat", this->step_scattering);
 
 	// VDB
 	this->shader->setUniform("u_3D_volume", this->texture, 0);
+	this->shader->setUniform("u_vdb_noise", this->vdb_noise);
 
 	if (!Application::instance->light_list.empty()) {
 		Application::instance->light_list[0]->setUniforms(this->shader, model);
@@ -352,6 +358,7 @@ void VolumeMaterial::renderInMenu()
 
 	if (this->shader != Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs")) { //If not homogeneous, show step size
 		ImGui::SliderFloat("Step size", &this->step, 0, 1);
+		ImGui::Checkbox("VDB Noise", &this->vdb_noise);
 	}
 
 	bool is_emission_shader = this->shader == Shader::Get("res/shaders/basic.vs", "res/shaders/emission_absorbtion.fs");
@@ -359,9 +366,11 @@ void VolumeMaterial::renderInMenu()
 
 	if (is_emission_shader || is_scattering_shader) {
 		ImGui::ColorEdit3("Emission color", (float*)&this->Le);
-		//ImGui::SliderFloat("Emission noise shift");
+		ImGui::SliderFloat("Emission noise shift", &this->emission_change, 0, 1);
 	}
 	if (is_scattering_shader) {
 		ImGui::SliderFloat("Scattering coefficient", &this->scat_coefficient, 0, 4);
+		ImGui::SliderFloat("Assymetric Parameter g", &this->g_coefficient, -1, 1);
+		ImGui::SliderFloat("Step size (scattering path tracer)", &this->step_scattering, 0, 1);
 	}
 }

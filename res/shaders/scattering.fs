@@ -1,4 +1,5 @@
 #version 330 core
+#define PI 3.14159265
 
 in vec3 v_position;
 in vec3 v_world_position;
@@ -17,6 +18,9 @@ uniform vec4 u_light_color;
 uniform vec3 u_local_light_position;
 uniform float u_scat_coefficient;
 uniform sampler3D u_3D_volume;
+uniform float u_step_scat;
+uniform float u_g;
+uniform bool u_vdb_noise;
 
 out vec4 FragColor; 
 
@@ -28,6 +32,12 @@ vec2 intersectAABB(vec3 rayOrigin, vec3 rayDir, vec3 boxMin, vec3 boxMax) {
     float tNear = max(max(t1.x, t1.y), t1.z);	
     float tFar = min(min(t2.x, t2.y), t2.z);
     return vec2(tNear, tFar);
+}
+
+//Phase function (Henyey-Greenstein)
+float phase_func(vec3 wi, vec3 wo) { //wi: Ray light vector, wo: Ray view vector
+	float phase = (1-pow(u_g, 2))/(pow(1+pow(u_g, 2)-2*u_g*dot(wi, wo), 1.5));
+	return 1/(4*PI) * phase;
 }
 
 // Noise function:
@@ -117,20 +127,26 @@ float noise(vec3 p, float i){
 // end of noise function
 // Using 3D data instead of random noise
 float noise3Ddata(vec3 pos) {
+	pos = clamp(pos, vec3(0.0), vec3(1.0));
 	return texture(u_3D_volume, pos).r;
 }
 
 // RAY MARCHING FUNCTIONS
 
 float getAbsorbtion(vec3 pos) {
+	if (u_vdb_noise == true) {
 	//POSITION SHOULD BE IN TEXTURE POSITION
 	pos = clamp(pos, vec3(0.0), vec3(1.0));
-
 	return clamp(noise3Ddata(pos), 0.0, 1.0);
+	}
+	
+	else {
+		return clamp(snoiseFractal(pos), 0.0, 1.0);
+	}
 }
 
-float computeStep(float inter) {
-	return u_step * inter;
+float computeStep(float step_, float inter) {
+	return step_ * inter;
 }
 
 vec3 getLight(vec3 pos) {
@@ -149,7 +165,7 @@ vec3 light_pathtacer(vec3 p, vec3 boxMin, vec3 boxMax) {
 	vec3 wi = to_light / light_distance;
     vec2 entry_exit = intersectAABB(p, wi, boxMin, boxMax);
 	float exit_dist = min(entry_exit[1], light_distance);
-    float delta = max(max(computeStep(exit_dist), exit_dist / 4.0), 0.01);
+    float delta = max(max(computeStep(u_step_scat,exit_dist), exit_dist / 4.0), 0.01);
     float i = delta * 0.5;
 	vec3 pos = wi * i + p;
 	float tau = 0.0;
@@ -183,7 +199,7 @@ void main()
 	float entry_dist = max(entry_exit[0], 0.0);
 	float exit_dist = entry_exit[1];
 
-	float delta = max(computeStep(exit_dist-entry_dist), 0.01);
+	float delta = max(computeStep(u_step, exit_dist-entry_dist), 0.01);
 	float i = delta * 0.5 + entry_dist;
 	vec3 pos = rayDir * i + rayOrigin;
 	float tau = 0.0;
@@ -202,7 +218,13 @@ void main()
 		float mu_t = sigma_a + sigma_s;
         float T = exp(-tau);
         emission += T * getLight(pos) * sigma_a * delta;
-        scatter += T * sigma_s * light_pathtacer(pos, boxMin, boxMax) * delta;
+
+		//Apply phase function
+		vec3 wo = -rayDir;
+		vec3 wi = normalize(u_local_light_position-pos);
+		float fx = phase_func(wi, wo);
+
+        scatter += fx * T * sigma_s * light_pathtacer(pos, boxMin, boxMax) * delta;
         tau += mu_t * delta;
 		i += delta;
 		pos = rayOrigin + rayDir * i;

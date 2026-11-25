@@ -46,7 +46,13 @@ void Application::init(GLFWwindow* window)
     // Adding light
     Light*  light_1 = new Light(glm::vec3(3.f), 1.f, glm::vec4(1.f));
     this->light_list.push_back(light_1);
-    
+
+    //Add mesh in the same position as the light for reference
+    SceneNode* light_mesh = new SceneNode("Light mesh");
+    light_mesh->mesh = Mesh::Get("res/meshes/sphere.obj");
+    light_mesh->material = new FlatMaterial(glm::vec4(1.0, 1.0, 1.0, 1.0));
+    light_mesh->model = glm::translate(light_mesh->model, glm::vec3(3.f)); // Same position as light
+    this->node_list.push_back(light_mesh);
 }
 
 void Application::update(float dt)
@@ -57,8 +63,6 @@ void Application::update(float dt)
         this->camera->orbit(-delta.x * dt, delta.y * dt);
     }
     this->lastMousePosition = this->mousePosition;
-
-    //Check current shader and change material
 }
 
 void Application::render()
@@ -209,7 +213,7 @@ void Application::onScroll(double xOffset, double yOffset)
             this->camera->fov = (float)max;
         }
     }
-    else {
+    else {  
         this->camera->fov -= 4.f;
         if (this->camera->fov < min) {
             this->camera->fov = (float)min;

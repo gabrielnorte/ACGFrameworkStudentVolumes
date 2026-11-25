@@ -72,6 +72,10 @@ public:
 	float step;
 	float scat_coefficient = 0.1f;
 	glm::vec3 Le = glm::vec3(0.0);
+	float g_coefficient = 0;
+	float step_scattering;
+	bool vdb_noise;
+	float emission_change;
 
 
 	VolumeMaterial(float abs_coefficient = 1, float step = 0.01);

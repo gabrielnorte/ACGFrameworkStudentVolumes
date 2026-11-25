@@ -175,6 +175,7 @@ VolumeMaterial::VolumeMaterial(float abs_coefficient_, float step_) {
 	this->step = step_;
 	this->step_scattering = step_;
 	this->vdb_noise = true;
+	this->emission_change = 1.0f;
 	//this->Le = Application::instance->ambient_light;
 	this->base_shader = Shader::Get("res/shaders/basic.vs", "res/shaders/absorptionmodel.fs");
 	this->shader = this->base_shader;

@@ -222,7 +222,7 @@ void main()
 		//Apply phase function
 		vec3 wo = -rayDir;
 		vec3 wi = normalize(u_local_light_position-pos);
-		float fx = phase_func(wi, wo);
+		float fx = phase_func(-wi, wo);
 
         scatter += fx * T * sigma_s * light_pathtacer(pos, boxMin, boxMax) * delta;
         tau += mu_t * delta;
